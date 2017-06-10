@@ -2,13 +2,14 @@ package com.tyskie.RESTService;
 
 import com.tyskie.DAOs.UserDAOImpl;
 import com.tyskie.Domain.User;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * Created by Thijs on 9-6-2017.
@@ -32,5 +33,28 @@ public class RESTService {
         String users = "User exists: " + exists + " Username: " + username + " Password: " + password;
 
         return users;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/show/all")
+    public Response showAllUsers(){
+        List<User> users = userDAO.getAllUsers();
+
+        JSONObject userObject = new JSONObject();
+        JSONArray userArray = new JSONArray();
+
+        for (User user : users) {
+            JSONObject userInformation = new JSONObject();
+            String username = user.getUsername();
+            String password = user.getPassword();
+            userInformation.put("username", username);
+            userInformation.put("password", password);
+            userArray.add(userInformation);
+        }
+
+        userObject.put("users", userArray);
+
+        return Response.status(200).entity(userObject).build();
     }
 }
